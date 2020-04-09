@@ -254,7 +254,7 @@ func (s *SqlRoleStore) channelHigherScopedPermissionsQuery(roleNames []string) s
 			RoleSchemes.DefaultChannelGuestRole AS GuestRoleName,
 			RoleSchemes.DefaultChannelUserRole AS UserRoleName,
 			RoleSchemes.DefaultChannelAdminRole AS AdminRoleName,
-			GuestRoles.Permissions AS HigherScopedGuestPermissions,
+			coalesce(GuestRoles.Permissions, '') AS HigherScopedGuestPermissions,
 			UserRoles.Permissions AS HigherScopedUserPermissions,
 			AdminRoles.Permissions AS HigherScopedAdminPermissions
 		FROM
@@ -262,7 +262,7 @@ func (s *SqlRoleStore) channelHigherScopedPermissionsQuery(roleNames []string) s
 			JOIN Channels ON Channels.SchemeId = RoleSchemes.Id
 			JOIN Teams ON Teams.Id = Channels.TeamId
 			JOIN Schemes ON Schemes.Id = Teams.SchemeId
-			JOIN Roles AS GuestRoles ON GuestRoles.Name = Schemes.DefaultChannelGuestRole
+			FULL JOIN Roles AS GuestRoles ON GuestRoles.Name = Schemes.DefaultChannelGuestRole
 			JOIN Roles AS UserRoles ON UserRoles.Name = Schemes.DefaultChannelUserRole
 			JOIN Roles AS AdminRoles ON AdminRoles.Name = Schemes.DefaultChannelAdminRole
 		WHERE
